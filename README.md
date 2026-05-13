@@ -101,10 +101,10 @@ Trained model weights are hosted separately due to file size constraints.
 
 | Model | Notes | Download |
 |---|---|---|
-| `lip_reading_v1.keras` | Baseline model | *(add link)* |
-| `best_lip_model.keras` | Best single-run checkpoint | *(add link)* |
-| `lip_model_finetuned.keras` | Fine-tuned on expanded data | *(add link)* |
-| `lip_model_finetuned_v2.keras` | Final fine-tuned version | *(add link)* |
+| `lip_reading_v1.keras` | Baseline model | [Download](https://huggingface.co/sxham04/lip_reading/resolve/main/lip_reading_v1.keras) |
+| `best_lip_model.keras` | Best single-run checkpoint | [Download](https://huggingface.co/sxham04/lip_reading/resolve/main/best_lip_model.keras) |
+| `lip_model_finetuned.keras` | Fine-tuned on expanded data | [Download](https://huggingface.co/sxham04/lip_reading/resolve/main/lip_model_finetuned.keras) |
+| `lip_model_finetuned_v2.keras` | Final fine-tuned version | [Download](https://huggingface.co/sxham04/lip_reading/resolve/main/lip_model_finetuned_v2.keras) |
 
 To use a pretrained model, download the `.keras` file and load it in the notebook:
 ```python
@@ -120,8 +120,8 @@ Model performance is measured using standard speech recognition metrics computed
 
 | Metric | Description |
 |---|---|
-| **CER** (Character Error Rate) | Percentage of individual characters incorrectly predicted |
-| **WER** (Word Error Rate) | Percentage of whole words incorrectly predicted |
+| **CER** (Character Error Rate) | 32% |
+| **WER** (Word Error Rate) | 32.2% |
 
 > **Results:** *(Add your best CER/WER scores here once evaluated — this is the most important section for demonstrating the model works.)*
 
