@@ -16,10 +16,12 @@ This repository contains an end-to-end deep learning pipeline for automated lip 
 * **Data Handling & Math:** NumPy, Pandas
 * **Visualization:** Matplotlib
 
-## Dataset Setup
-The data ingestion pipeline expects the following structure:
-* **Videos (`.mpg`):** Raw video data. The preprocessing script automatically standardizes these to exactly 75 frames.
-* **Alignments (`.align`):** Structured text documents containing the ground-truth phonetic timeline. Used to filter out silence (`sil`/`sp`) and extract the exact character sequence for the CTC loss calculation.
+## Dataset
+This project utilizes the [LipReading Dataset](https://www.kaggle.com/datasets/mohamedbentalb/lipreading-dataset) hosted on Kaggle. It consists of short video clips of speakers accompanied by forced-alignment text files that provide the exact phonetic timestamps.
+
+The data ingestion pipeline processes this dataset using the following structure:
+* **Videos (`.mpg`):** Raw video data. The preprocessing script automatically standardizes these clips to exactly 75 frames to ensure uniform tensor dimensions for the 3D-CNN.
+* **Alignments (`.align`):** Structured text documents containing the ground-truth phonetic timeline. These are parsed to filter out silence (`sil`/`sp`) and extract the exact character sequence required for the CTC loss calculation.
 
 ## Model Architecture
 1. **Input Stage:** 75 Frames, 112x112 spatial resolution, 1 channel (Grayscale).
