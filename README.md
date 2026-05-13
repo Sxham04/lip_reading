@@ -1,37 +1,132 @@
 # Deep Learning Lip Reading Pipeline
 
-## Overview
-This repository contains an end-to-end deep learning pipeline for automated lip reading. It processes raw video footage of speakers and translates their lip movements into text sequences without the need for audio. The project leverages a hybrid Spatio-Temporal neural network, combining 3D Convolutional Neural Networks (3D-CNN) and Bidirectional LSTMs (Bi-LSTM), trained using Connectionist Temporal Classification (CTC) Loss.
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square&logo=python)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange?style=flat-square&logo=tensorflow)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
+An end-to-end deep learning pipeline that translates lip movements in silent video into text sequences. The model uses a hybrid Spatio-Temporal architecture combining 3D Convolutional Neural Networks (3D-CNN) and Bidirectional LSTMs (Bi-LSTM), trained using Connectionist Temporal Classification (CTC) Loss.
+
+---
+
+## Project Structure
+
+```
+lip_reading/
+├── main_nb.ipynb         # Full pipeline: preprocessing, training, and evaluation
+├── metadata.csv          # Dataset metadata and file mappings
+├── .gitignore
+└── README.md
+```
+
+> Trained model weights and the video dataset are not included in this repository. See the [Dataset](#dataset) and [Pretrained Weights](#pretrained-weights) sections below.
+
+---
 
 ## Features
-* **Automated Video Preprocessing:** Dynamically extracts a 112x112 Region of Interest (ROI) focused on the lips, converts frames to grayscale, and applies CLAHE for contrast enhancement.
-* **Memory-Efficient Data Generators:** Utilizes dynamic batch processing to load massive 4D video tensors without crashing system RAM.
-* **Spatio-Temporal Architecture:** 3D-CNNs extract geometric lip motion, while Bi-LSTMs evaluate contextual phonetic patterns over time.
-* **Alignment-Free Training:** CTC Loss allows the model to learn dynamically from unsegmented videos without requiring manual, frame-by-frame text mapping.
-* **Strict Evaluation Metrics:** Calculates exact Character Error Rate (CER) and Word Error Rate (WER) using Levenshtein distance computations.
+
+- **Automated Video Preprocessing:** Dynamically extracts a 112×112 Region of Interest (ROI) focused on the lips, converts frames to grayscale, and applies CLAHE for contrast enhancement.
+- **Memory-Efficient Data Generators:** Uses dynamic batch processing to load massive 4D video tensors without loading the full dataset into memory.
+- **Spatio-Temporal Architecture:** 3D-CNNs capture geometric lip motion features, while Bi-LSTMs model contextual phonetic patterns over time.
+- **Alignment-Free Training:** CTC Loss allows the model to learn from unsegmented videos without requiring manual, frame-by-frame text annotation.
+- **Rigorous Evaluation:** Calculates Character Error Rate (CER) and Word Error Rate (WER) using the Levenshtein Distance algorithm.
+
+---
 
 ## Tech Stack
-* **Deep Learning Framework:** TensorFlow & Keras
-* **Computer Vision:** OpenCV (`cv2`)
-* **Data Handling & Math:** NumPy, Pandas
-* **Visualization:** Matplotlib
+
+| Purpose | Library |
+|---|---|
+| Deep Learning | TensorFlow & Keras |
+| Computer Vision | OpenCV (`cv2`) |
+| Data Handling | NumPy, Pandas |
+| Visualization | Matplotlib |
+
+---
+
+## Setup & Installation
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/Sxham04/lip_reading.git
+cd lip_reading
+```
+
+**2. Install dependencies**
+```bash
+pip install tensorflow opencv-python numpy pandas matplotlib
+```
+
+**3. Download the dataset** (see [Dataset](#dataset) section below) and place it in a `data/` folder at the project root.
+
+**4. Open and run the notebook**
+```bash
+jupyter notebook main_nb.ipynb
+```
+
+---
 
 ## Dataset
-This project utilizes the [LipReading Dataset](https://www.kaggle.com/datasets/mohamedbentalb/lipreading-dataset) hosted on Kaggle. It consists of short video clips of speakers accompanied by forced-alignment text files that provide the exact phonetic timestamps.
 
-The data ingestion pipeline processes this dataset using the following structure:
-* **Videos (`.mpg`):** Raw video data. The preprocessing script automatically standardizes these clips to exactly 75 frames to ensure uniform tensor dimensions for the 3D-CNN.
-* **Alignments (`.align`):** Structured text documents containing the ground-truth phonetic timeline. These are parsed to filter out silence (`sil`/`sp`) and extract the exact character sequence required for the CTC loss calculation.
+This project uses the [LipReading Dataset](https://www.kaggle.com/datasets/mohamedbentalb/lipreading-dataset) hosted on Kaggle. It consists of short video clips of speakers accompanied by forced-alignment text files with exact phonetic timestamps.
+
+The pipeline expects the following structure inside `data/`:
+```
+data/
+├── videos/        # Raw .mpg video clips
+└── alignments/    # .align files with ground-truth phonetic timelines
+```
+
+**Preprocessing steps applied automatically:**
+- **Videos (`.mpg`):** Standardized to exactly 75 frames for uniform 3D-CNN input dimensions.
+- **Alignments (`.align`):** Silence tokens (`sil`, `sp`) are filtered out; the remaining character sequence is used for CTC loss computation.
+
+---
 
 ## Model Architecture
-1. **Input Stage:** 75 Frames, 112x112 spatial resolution, 1 channel (Grayscale).
-2. **3D-CNN & MaxPooling:** Slides 3D mathematical filters across height, width, and time to extract visual features, aggressively down-sampling to preserve core geometric shapes.
-3. **Reshape Layer:** Flattens spatial tensors into a sequence format (75 x 14700) for the recurrent layers.
-4. **Bi-LSTM:** Processes the sequence in both forward and backward directions to grasp complete linguistic context.
-5. **Dropout Layer:** Applies 50% regularization to prevent overfitting on specific lighting or skin tones.
-6. **Dense Output:** Softmax activation evaluating a 28-character vocabulary (plus the CTC blank token).
+
+| Stage | Details |
+|---|---|
+| Input | 75 frames × 112×112 spatial resolution × 1 channel (grayscale) |
+| 3D-CNN + MaxPooling | Extracts spatio-temporal visual features; progressively down-samples across height, width, and time |
+| Reshape | Flattens spatial tensors to a sequence of shape `(75, 14700)` for recurrent layers |
+| Bi-LSTM | Processes the sequence in both directions to capture full linguistic context |
+| Dropout (50%) | Reduces overfitting |
+| Dense + Softmax | Outputs over a 28-character vocabulary (a–z, space, CTC blank token) |
+
+---
+
+## Pretrained Weights
+
+Trained model weights are hosted separately due to file size constraints.
+
+| Model | Notes | Download |
+|---|---|---|
+| `lip_reading_v1.keras` | Baseline model | *(add link)* |
+| `best_lip_model.keras` | Best single-run checkpoint | *(add link)* |
+| `lip_model_finetuned.keras` | Fine-tuned on expanded data | *(add link)* |
+| `lip_model_finetuned_v2.keras` | Final fine-tuned version | *(add link)* |
+
+To use a pretrained model, download the `.keras` file and load it in the notebook:
+```python
+from tensorflow import keras
+model = keras.models.load_model("best_lip_model.keras")
+```
+
+---
 
 ## Evaluation
-The model's accuracy is benchmarked against rigorous NLP standards using the Levenshtein Distance matrix:
-* **Character Error Rate (CER):** Evaluates the percentage of individual letters incorrectly predicted.
-* **Word Error Rate (WER):** Evaluates the percentage of whole words incorrectly predicted.
+
+Model performance is measured using standard speech recognition metrics computed via Levenshtein Distance:
+
+| Metric | Description |
+|---|---|
+| **CER** (Character Error Rate) | Percentage of individual characters incorrectly predicted |
+| **WER** (Word Error Rate) | Percentage of whole words incorrectly predicted |
+
+> **Results:** *(Add your best CER/WER scores here once evaluated — this is the most important section for demonstrating the model works.)*
+
+---
+
+## License
+
+This project is licensed under the MIT License.
